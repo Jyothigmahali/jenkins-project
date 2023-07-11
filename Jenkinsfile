@@ -89,12 +89,12 @@ pipeline {
                 repository: "${RELEASE-REPO}",
                 credentialsId: "${NEXU_LOGIN}",
                 artifacts: [
-                    [artifactId: vproapp,
+                    [artifactId: 'vproapp',
                      classifier: '',
                      file: 'target/vprofile-v2.war',
                      type: 'war']
-        ]
-     )
+                    ]
+                )
             }
         }
     }
