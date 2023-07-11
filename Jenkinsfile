@@ -76,19 +76,34 @@ pipeline {
                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
             }
-
-            // timeout(time: 10, unit: 'MINUTES') {
-            //    waitForQualityGate abortPipeline: true
-            // }
           }
         }
         stage ("Quality Gate"){
             steps{
-                timeout(time: 1, unit: 'HOURS')
-                waitForQualityGate abortPipeline: true
+                timeout(time: 1, unit: 'HOURS'){
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
-
+        stage ("Upload Artifact"){
+            steps{
+                nexusArtifactUploader(
+                nexusVersion: 'nexus3',
+                protocol: 'http',
+                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                groupId: 'QA',
+                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                repository: "${RELEASE_REPO}",
+                credentialsId: ${NEXUS_LOGIN},
+                artifacts: [
+                    [artifactId: 'jenkinsapp',
+                        classifier: '',
+                        file: 'target/vprofile-v2.war',
+                        type: 'war']
+                    ]
+                )
+            }
+        }
         // stage("Publish to Nexus Repository Manager") {
         //     steps {
         //         script {
