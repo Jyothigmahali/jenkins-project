@@ -11,7 +11,7 @@ pipeline {
         SNAP_REPO = 'vprofile_snapshot'
         NEXUS_USER = 'admin'
         NEXUS_PASS = 'Jyothi@1809'
-        RELEASE_REPO = 'vprofile-release'
+        RELEASE_REPO = 'vprofil-release'
         CENTRAL_REPO = 'vpro-maven-central'
         NEXUSIP = '172.31.92.141'
         NEXUSPORT = '8081'
@@ -76,33 +76,11 @@ pipeline {
                    -Dsonar.jacoco.reportsPath=target/jacoco.exec \
                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
             }
-          }
-        }
-        // stage ("Quality Gate"){
-        //     steps{
-        //         timeout(time: 15, unit: 'MINUTES'){
-        //             waitForQualityGate abortPipeline: true
-        //         }
-        //     }
-        // }
-        stage ("Upload Artifact"){
-            steps{
-                nexusArtifactUploader(
-                nexusVersion: 'nexus3',
-                protocol: 'http',
-                nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
-                groupId: 'QA',
-                version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                repository: "${RELEASE_REPO}",
-                credentialsId: "${NEXUS_LOGIN}",
-                artifacts: [
-                    [artifactId: 'vproapp',
-                        classifier: '',
-                        file: 'target/vprofile-v2.war',
-                        type: 'war']
-                    ]
-                )
+
+            timeout(time: 10, unit: 'MINUTES') {
+               waitForQualityGate abortPipeline: true
             }
+          }
         }
     }
 }
